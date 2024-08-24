@@ -13,7 +13,7 @@ import numpy as np
 
 import sys, select, termios, tty
 
-dead_zone=0.1
+dead_zone=0.05
 pub_frequency = 5
 turning_ratio_threshold = 0.6
 
@@ -140,7 +140,9 @@ def getKey(key_timeout):
 
 def vels(speed, turn):
     return "currently:\tspeed %s\tturn %s " % (speed,turn)
+
 pygame.init()
+
 if __name__=="__main__":
 
     sleep = threading.Event()
@@ -252,18 +254,22 @@ if __name__=="__main__":
                         if hat[0] != 0:
                             speed = 0
                             turn = -hat[0]
-                        
+                            print('\n-----------------------')
+                            print('[Time: {0:8.4f}]\n[Linear Speed: {1:2.4f}]\n[Angular Speed: {2:2.4f}]'.format(seconds,speed,turn))
+                            print('-----------------------\n')
                             pub_thread.update(x, y, z, th, speed, turn)
                             sleep.wait(3)
                         else:
                             pub_thread.update(x, y, z, th, speed, turn)
+                            print('\n-----------------------')
+                            print('[Time: {0:8.4f}]\n[Linear Speed: {1:2.4f}]\n[Angular Speed: {2:2.4f}]'.format(seconds,speed,turn))
+                            print('-----------------------\n')
                     else: 
                         print("WARN: v/w ratio too small. {}/{}={}".format(np.round(axis[1],3),np.round(axis[0],3),np.round(ratio,3)))
                 
                 
             clock.tick(pub_frequency)
             seconds = rospy.get_time()
-            print('[Time: {0:8.4f}] [Linear Speed: {1:2.4f}] [Angular Speed: {2:2.4f}]'.format(seconds,speed,turn))
         pygame.quit()
     except KeyboardInterrupt:
         print("\nInterruzione da tastiera ricevuta. Terminazione del programma.")
